@@ -4,6 +4,7 @@
 package com.specmart.manage.employee.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,5 +27,30 @@ public class EmployeeService {
 	
 	public List<Employee> getAllEmployees(){
 		return repository.findAll();
+	}
+	
+	public Employee getEmployeeById(Long id) {
+		Optional<Employee> employee = repository.findById(id);
+		return employee.orElseThrow(() -> 
+			new RuntimeException("Employee not found with id: "+id));
+	}
+	
+	public String deleteEmployee(Long id) {
+		repository.deleteById(id);
+		return "Employee deleted successfully";
+	}
+	
+	public Employee updateEmployee(Long id, Employee updatedEmployee) {
+		Employee existingEmployee = repository.findById(id).orElse(null);
+
+		if(existingEmployee != null) {
+			existingEmployee.setName(updatedEmployee.getName());
+			existingEmployee.setEmail(updatedEmployee.getEmail());
+			existingEmployee.setSalary(updatedEmployee.getSalary());
+			existingEmployee.setDepartment(updatedEmployee.getDepartment());
+			
+			return repository.save(existingEmployee);
+		}
+		return null;
 	}
 }
